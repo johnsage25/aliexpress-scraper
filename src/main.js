@@ -41,6 +41,13 @@ Apify.main(async () => {
             stealth: true,
             args: ['--lang=en-US,en'],
         }),
+        gotoFunction: async ({ request, page }) => {
+            // goto options
+            return page.goto(request.url, {
+                timeout: 121 * 1000,
+                waitUntil: 'load',
+            });
+        },
         handlePageFunction: async (context) => {
             const { request, response, page } = context;
             log.debug(`CRAWLER -- Processing ${request.url}`);
