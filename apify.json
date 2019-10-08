@@ -1,0 +1,9 @@
+{
+	"name": "apify-aliexpress-actor",
+	"version": "0.1",
+	"buildTag": "latest",
+	"env": {
+		"APIFY_MEMORY_MBYTES": 4096
+	},
+	"template": "puppeteer_crawler"
+}

@@ -1,0 +1,66 @@
+{
+    "title": "Aliexpress.com Scraper",
+    "description": "An actor that scrapes products from aliexpress.com",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "maxConcurrency": {
+            "title": "Maximum Concurrency",
+            "type": "integer",
+            "description": "Maximum concurrency that you want to run actor",
+            "editor": "number",
+            "default": 500
+        },
+        "minConcurrency": {
+            "title": "Minimum Concurrency",
+            "type": "integer",
+            "description": "Minimum concurrency that you want to run actor",
+            "editor": "number",
+            "default": 1
+        },
+        "liveView": {
+            "title": "Liveview",
+            "type": "boolean",
+            "description": "Live view option for crawler (Not recommended)",
+            "editor": "checkbox",
+            "default": false
+        },
+        "country": {
+            "title": "Country",
+            "type": "string",
+            "description": "Select your country that you want to fecth products",
+            "editor": "select",
+            "default": "us",
+            "enum": ["US", "DE", "FR"],
+            "enumTitles": ["USA", "Germany", "France"]
+        },
+        "startPage": {
+            "title": "Category start page",
+            "type": "integer",
+            "description": "The page number that you want to start with.",
+            "editor": "number",
+            "default": 1
+        },
+        "endPage": {
+            "title": "Category end page",
+            "type": "integer",
+            "description": "The page number that you want to end with. By default there is no end page.",
+            "editor": "number",
+            "default": -1
+        },
+        "categoryStartIndex": {
+            "title": "Category start index",
+            "type": "integer",
+            "description": "Category index that you want to start on. You can limit crawling categories with that attribute",
+            "editor": "number",
+            "default": 0
+        },
+        "categoryEndIndex": {
+            "title": "Category end index",
+            "type": "integer",
+            "description": "Category index that you want to end with. You can limit crawling categories with that attribute. By default there is no end index.",
+            "editor": "number",
+            "default": -1
+        },
+    }
+}
