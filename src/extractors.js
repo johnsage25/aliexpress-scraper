@@ -43,7 +43,7 @@ const getAllSubCategories = async (base, mainCategoryPaths, page) => {
 // Filters sub categories with given options
 const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, subCategories) => {
     // Calculate end index
-    const endIndex = categoryEndIndex > 0 ? categoryEndIndex - categoryStartIndex : subCategories.length - categoryStartIndex - 1;
+    const endIndex = categoryEndIndex > 0 ? categoryEndIndex : subCategories.length - 1;
 
     // Slice array
     return subCategories.slice(categoryStartIndex, endIndex);
@@ -222,15 +222,17 @@ const getProductQuestions = async (userInput, id, url, currentPage = 1) => {
     });
 
     // Quit recursion
-    if (!data || !data.questionList || data.questionList.length === 0) {
+    if (!data || !data.body || !data.body.questionList || data.body.questionList.length === 0) {
         return [];
     }
 
     // Random delay
     await Promise.delay(Math.random() * 5000);
 
+    const questions = data.body.questionList;
+
     // Recursively continue;
-    return data.questionList.concat(await getProductQuestions(userInput, id, url, currentPage + 1));
+    return questions.concat(await getProductQuestions(userInput, id, url, currentPage + 1));
 };
 
 
