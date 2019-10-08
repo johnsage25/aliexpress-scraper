@@ -21,10 +21,10 @@ const getAllSubCategories = async (base, mainCategoryPaths, page) => {
     // Fetch all subcategories
     for (const categoryPath of mainCategoryPaths) {
         // Random delay
-        await page.waitFor(Math.random() * 5000);
+        await page.waitFor(Math.random() * 1000);
 
         // Go to subcategory page
-        await page.goto(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`);
+        await page.goto(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0 });
 
         // Fetch links
         subCategories = subCategories.concat(
@@ -129,10 +129,10 @@ const getProductDetail = async page => page.evaluate(async () => {
 // Get description HTML of product
 const getProductDescription = async (descriptionURL, page) => {
     // Random delay
-    await page.waitFor(Math.random() * 5000);
+    await page.waitFor(Math.random() * 1000);
 
     // Fetch description HTML
-    await page.goto(descriptionURL);
+    await page.goto(descriptionURL, { timeout: 0 });
     return page.evaluate(async () => {
         return document.querySelector('body').innerHTML;
     });
@@ -197,7 +197,7 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
     }
 
     // Random delay
-    await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random() * 1000);
 
     // Recursively call itself
     return feedbacks.concat(await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1));
@@ -227,7 +227,7 @@ const getProductQuestions = async (userInput, id, url, currentPage = 1) => {
     }
 
     // Random delay
-    await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random() * 1000);
 
     const questions = data.body.questionList;
 

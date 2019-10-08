@@ -104,14 +104,14 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
 
 
     // Delay in random
-    await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random()* 1000);
 
     // Fetch description
     product.description = await extractors.getProductDescription(product.descriptionURL, page);
     delete product.descriptionURL;
 
     // Delay in random
-    await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random()* 1000);
 
     // Get Feedbacks
     product.feedbacks = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
@@ -119,7 +119,7 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
     delete product.memberId;
 
     // Delay in random
-    await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random()* 1000);
 
     // Fetch questions
     product.questions = await extractors.getProductQuestions(userInput, productId, request.url);
