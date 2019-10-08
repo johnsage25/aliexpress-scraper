@@ -28,32 +28,11 @@ exports.createRouter = (globalContext) => {
 };
 
 // Creates proxy URL with user input
-exports.createProxyUrl = (userInput) => {
-    return `http://country-${userInput.country}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
-};
-
-// Creates language option with user input
-exports.getLanguageOfBrowser = (userInput) => {
-    let lang = '';
-    switch (userInput.country) {
-        case 'US':
-            lang = 'en-US, en';
-            break;
-        case 'DE':
-            lang = 'de-DE, de';
-            break;
-        case 'FR':
-            lang = 'fr-FR, fr';
-            break;
-
-        default:
-            break;
-    }
-
-    return lang;
+exports.createProxyUrl = () => {
+    return `http://country-US:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
 };
 
 // Returns an axios instance with proxy and timeout options set
-exports.getProxyAgent = (userInput) => {
-    return new HttpsProxyAgent(this.createProxyUrl(userInput));
+exports.getProxyAgent = () => {
+    return new HttpsProxyAgent(this.createProxyUrl());
 };

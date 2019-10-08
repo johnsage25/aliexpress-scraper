@@ -2,7 +2,9 @@
 1. [Description](#description)
 2. [Flow](#actor-flow)
 3. [Options](#options)
+4. [Notes](#notes)
 4. [Sample Result](#sample-result)
+
 
 
 <a name="description"></a>
@@ -57,5 +59,13 @@ An Apify actor that fetches restaurants from aliexpress.com. The actor can start
 	- Default is `null`
 
 
+<a name="notes"></a>
+## Notes
+Ali Express got several anti-scraping solutions. For the best performance you should run this actor several times with different options. 
+
+
 <a name="sample-result"></a>
 ## Sample Result
+```
+
+```

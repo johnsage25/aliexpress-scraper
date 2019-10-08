@@ -3,7 +3,8 @@
 	"version": "0.1",
 	"buildTag": "latest",
 	"env": {
-		"APIFY_MEMORY_MBYTES": 4096
+		"APIFY_MEMORY_MBYTES": 4096,
+		"APIFY_LOG_LEVEL": "DEBUG"
 	},
 	"template": "puppeteer_crawler"
 }

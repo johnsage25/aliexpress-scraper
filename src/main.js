@@ -35,11 +35,11 @@ Apify.main(async () => {
         useLiveView: userInput.liveView,
         launchPuppeteerFunction: async () => Apify.launchPuppeteer({
             // Proxy options
-            proxyUrl: tools.createProxyUrl(userInput),
+            proxyUrl: tools.createProxyUrl(),
             userAgent: Apify.utils.getRandomUserAgent(),
             headless: true,
             stealth: true,
-            args: [`--lang=${tools.getLanguageOfBrowser(userInput)}`],
+            args: ['--lang=en-US,en'],
         }),
         handlePageFunction: async (context) => {
             const { request, response, page } = context;

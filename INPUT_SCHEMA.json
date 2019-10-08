@@ -25,15 +25,6 @@
             "editor": "checkbox",
             "default": false
         },
-        "country": {
-            "title": "Country",
-            "type": "string",
-            "description": "Select your country that you want to fecth products",
-            "editor": "select",
-            "default": "us",
-            "enum": ["US", "DE", "FR"],
-            "enumTitles": ["USA", "Germany", "France"]
-        },
         "startPage": {
             "title": "Category start page",
             "type": "integer",
@@ -61,6 +52,6 @@
             "description": "Category index that you want to end with. You can limit crawling categories with that attribute. By default there is no end index.",
             "editor": "number",
             "default": -1
-        },
+        }
     }
 }

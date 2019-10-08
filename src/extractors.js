@@ -81,8 +81,9 @@ const getProductDetail = async page => page.evaluate(async () => {
 
     return {
         id: actionModule.productId,
+        link: window.location.href,
         title: titleModule.subject,
-        tradeAmount: `${titleModule.tradeCount} ${titleModule.tradeCountUnit}`,
+        tradeAmount: `${titleModule.tradeCount ? titleModule.tradeCount : ''} ${titleModule.tradeCountUnit ? titleModule.tradeCountUnit : ''}`,
         averageStar: titleModule.feedbackRating.averageStar,
         descriptionURL: descriptionModule.descriptionUrl,
         store: {
@@ -92,7 +93,7 @@ const getProductDetail = async page => page.evaluate(async () => {
             positiveRate: storeModule.positiveRate,
             name: storeModule.storeName,
             id: storeModule.storeNum,
-            url: storeModule.storeURL,
+            url: `https:${storeModule.storeURL}`,
             topRatedSeller: storeModule.topRatedSeller,
         },
         specs: specsModule.props.map((spec) => {
@@ -148,7 +149,7 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
             'User-Agent': Apify.utils.getRandomUserAgent(),
             'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
         },
-        agent: tools.getProxyAgent(userInput),
+        agent: tools.getProxyAgent(),
         withCredentials: true,
         data: qs.stringify({
             withAdditionalFeedback: false,
@@ -216,7 +217,7 @@ const getProductQuestions = async (userInput, id, url, currentPage = 1) => {
             'Cache-Control': 'no-cache',
             Host: 'www.aliexpress.com',
         },
-        agent: tools.getProxyAgent(userInput),
+        agent: tools.getProxyAgent(),
         withCredentials: true,
     });
 
