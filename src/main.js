@@ -53,7 +53,7 @@ Apify.main(async () => {
             context.userInput = userInput;
 
             // Random delay
-            // await page.waitFor(Math.random() * 5000);
+            await page.waitFor(Math.random() * 5000);
 
             // Redirect to route
             await router(request.userData.label, context);

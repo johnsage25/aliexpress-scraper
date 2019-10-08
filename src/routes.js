@@ -94,7 +94,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
 
 // Product page crawler
 // Fetches product detail from detail page
-exports.PRODUCT = async ({ page, userInput, request }, { requestQueue }) => {
+exports.PRODUCT = async ({ page, userInput, request }) => {
     const { productId } = request.userData;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
@@ -103,30 +103,29 @@ exports.PRODUCT = async ({ page, userInput, request }, { requestQueue }) => {
     const product = await extractors.getProductDetail(page);
 
 
+    // Delay in random
+    await Promise.delay(Math.random() * 5000);
+
     // Fetch description
     product.description = await extractors.getProductDescription(product.descriptionURL, page);
     delete product.descriptionURL;
 
-    // Fetch Recommendations
-    // product.recommendations = await extractors.getProductRecommendations(userInput, request.url);
-
-    // Fetch similar products
-    // product.similarProducts = https://gpsfront.aliexpress.com/getI2iRecommendingResults.do?currentItemList=4000016604997&categoryId=200001411&shopId=2534028&companyId=237380546&recommendType=toOtherSeller&scenario=pcDetailBottomMoreOtherSeller&limit=30&offset=0&callback=__zoro_request_4
-
     // Delay in random
-    // await Promise.delay(Math.random() * 5000);
+    await Promise.delay(Math.random() * 5000);
 
     // Get Feedbacks
     product.feedbacks = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
     delete product.companyId;
     delete product.memberId;
 
-    console.log(product.feedbacks);
+    // Delay in random
+    await Promise.delay(Math.random() * 5000);
+
     // Fetch questions
-    // product.questions = https://www.aliexpress.com/aeglodetailweb/api/questions?productId=4000016604997&currentPage=1&pageSize=5 WITH REFERRER of past page
+    product.questions = await extractors.getProductQuestions(userInput, productId, request.url);
 
     // Push data
-    // await Apify.pushData({ ...product, description });
+    await Apify.pushData({ ...product });
 
     log.debug(`CRAWLER -- Fetching product: ${productId} completed and successfully pushed to dataset`);
 };

@@ -10,10 +10,9 @@ const {
 exports.getSources = async () => {
     log.debug('Getting sources');
     return {
-        url: 'https://www.aliexpress.com/item/4000016604997.html', // 'https://www.aliexpress.com/',
+        url: 'https://www.aliexpress.com/',
         userData: {
-            label: 'PRODUCT', // 'HOME',
-            productId: 4000016604997,
+            label: 'HOME',
         },
     };
 };
@@ -56,5 +55,5 @@ exports.getLanguageOfBrowser = (userInput) => {
 
 // Returns an axios instance with proxy and timeout options set
 exports.getProxyAgent = (userInput) => {
-    return new HttpsProxyAgent('http://127.0.0.1:8888'); // this.createProxyUrl(userInput)
+    return new HttpsProxyAgent(this.createProxyUrl(userInput));
 };

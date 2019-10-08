@@ -1,5 +1,6 @@
 const Apify = require('apify');
 const axios = require('axios');
+const Promise = require('bluebird');
 const uniqBy = require('lodash/uniqBy');
 const qs = require('querystring');
 const cheerio = require('cheerio');
@@ -136,6 +137,7 @@ const getProductDescription = async (descriptionURL, page) => {
     });
 };
 
+
 // Fetch feedbacks recursively
 const getProductFeedbacks = async (userInput, id, url, companyId, memberId, currentPage = 1) => {
     // Send request
@@ -193,8 +195,41 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
         return [];
     }
 
+    // Random delay
+    await Promise.delay(Math.random() * 5000);
+
     // Recursively call itself
     return feedbacks.concat(await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1));
+};
+
+
+// Fetch product questions recursively
+const getProductQuestions = async (userInput, id, url, currentPage = 1) => {
+    // Send request
+    const { data } = await axios({
+        method: 'GET',
+        url: `https://www.aliexpress.com/aeglodetailweb/api/questions?productId=${id}&currentPage=${currentPage}&pageSize=500`,
+        headers: {
+            'User-Agent': Apify.utils.getRandomUserAgent(),
+            referer: url,
+            Accept: '*/*',
+            'Cache-Control': 'no-cache',
+            Host: 'www.aliexpress.com',
+        },
+        agent: tools.getProxyAgent(userInput),
+        withCredentials: true,
+    });
+
+    // Quit recursion
+    if (!data || !data.questionList || data.questionList.length === 0) {
+        return [];
+    }
+
+    // Random delay
+    await Promise.delay(Math.random() * 5000);
+
+    // Recursively continue;
+    return data.questionList.concat(await getProductQuestions(userInput, id, url, currentPage + 1));
 };
 
 
@@ -206,4 +241,5 @@ module.exports = {
     getProductDetail,
     getProductDescription,
     getProductFeedbacks,
+    getProductQuestions,
 };
