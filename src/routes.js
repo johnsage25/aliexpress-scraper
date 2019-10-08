@@ -30,7 +30,7 @@ exports.HOME = async ({ page, userInput, request }, { requestQueue }) => {
     // Adding all subcategory links to queue
     for (const filteredSubCategory of filteredSubCategories) {
         await requestQueue.addRequest({
-            url: filteredSubCategory,
+            url: `${filteredSubCategory}?SortType=total_tranpro_desc`,
             userData: {
                 label: 'CATEGORY',
                 pageNum: startPage || 1,
@@ -61,7 +61,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
         if (endPage > 0 ? pageNum + 1 <= endPage : true) {
             // Add next page of same category to queue
             await requestQueue.addRequest({
-                url: `${categoryBaseURL}?page=${pageNum + 1}`,
+                url: `${categoryBaseURL}?page=${pageNum + 1}&SortType=total_tranpro_desc`,
                 userData: {
                     label: 'CATEGORY',
                     pageNum: pageNum + 1,
