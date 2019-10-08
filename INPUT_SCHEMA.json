@@ -61,14 +61,14 @@
             "default": false
         },
         "includeFeedbacks": {
-            "title": "Liveview",
+            "title": "Feedbacks",
             "type": "boolean",
             "description": "Include feedbacks of products. It might slow the process a bit",
             "editor": "checkbox",
             "default": false
         },
         "includeDescription": {
-            "title": "Liveview",
+            "title": "Description",
             "type": "boolean",
             "description": "Include description for products. It might slow the process a bit",
             "editor": "checkbox",
