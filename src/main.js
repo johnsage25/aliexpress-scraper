@@ -44,7 +44,7 @@ Apify.main(async () => {
         gotoFunction: async ({ request, page }) => {
             // goto options
             return page.goto(request.url, {
-                timeout: 121 * 1000,
+                timeout: 0,
                 waitUntil: 'load',
             });
         },
