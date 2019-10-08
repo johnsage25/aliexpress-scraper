@@ -96,33 +96,42 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
 // Fetches product detail from detail page
 exports.PRODUCT = async ({ page, userInput, request }) => {
     const { productId } = request.userData;
+    const { includeQuestions = false, includeFeedbacks = false, includeDescription = false } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
     // Fetch product details
     const product = await extractors.getProductDetail(page);
 
+    // Check description option
+    if (includeDescription) {
+        // Delay in random
+        await Promise.delay(Math.random() * 1000);
 
-    // Delay in random
-    await Promise.delay(Math.random()* 1000);
+        // Fetch description
+        product.description = await extractors.getProductDescription(product.descriptionURL, page);
+        delete product.descriptionURL;
+    }
 
-    // Fetch description
-    product.description = await extractors.getProductDescription(product.descriptionURL, page);
-    delete product.descriptionURL;
+    // Check feedback option
+    if (includeFeedbacks) {
+        // Delay in random
+        await Promise.delay(Math.random() * 1000);
 
-    // Delay in random
-    await Promise.delay(Math.random()* 1000);
+        // Get Feedbacks
+        product.feedbacks = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
+        delete product.companyId;
+        delete product.memberId;
+    }
 
-    // Get Feedbacks
-    product.feedbacks = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
-    delete product.companyId;
-    delete product.memberId;
+    // Check question option
+    if (includeQuestions) {
+        // Delay in random
+        await Promise.delay(Math.random() * 1000);
 
-    // Delay in random
-    await Promise.delay(Math.random()* 1000);
-
-    // Fetch questions
-    product.questions = await extractors.getProductQuestions(userInput, productId, request.url);
+        // Fetch questions
+        product.questions = await extractors.getProductQuestions(userInput, productId, request.url);
+    }
 
     // Push data
     await Apify.pushData({ ...product });

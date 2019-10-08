@@ -52,6 +52,27 @@
             "description": "Category index that you want to end with. You can limit crawling categories with that attribute. By default there is no end index.",
             "editor": "number",
             "default": -1
+        },
+        "includeQuestions": {
+            "title": "Questions",
+            "type": "boolean",
+            "description": "Include questions of products. It might slow the process a bit",
+            "editor": "checkbox",
+            "default": false
+        },
+        "includeFeedbacks": {
+            "title": "Liveview",
+            "type": "boolean",
+            "description": "Include feedbacks of products. It might slow the process a bit",
+            "editor": "checkbox",
+            "default": false
+        },
+        "includeDescription": {
+            "title": "Liveview",
+            "type": "boolean",
+            "description": "Include description for products. It might slow the process a bit",
+            "editor": "checkbox",
+            "default": false
         }
     }
 }
