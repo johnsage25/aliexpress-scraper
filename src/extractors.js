@@ -133,8 +133,9 @@ const getProductDescription = async (descriptionURL, page) => {
 
     // Fetch description HTML
     await page.goto(descriptionURL, { timeout: 0 });
+
     return page.evaluate(async () => {
-        return document.querySelector('body').innerHTML;
+        return Array.from(document.querySelectorAll('img')).map(img => img.src);
     });
 };
 
