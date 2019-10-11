@@ -111,7 +111,7 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
         // Fetch description
         const { description, overview } = await extractors.getProductDescription(product.descriptionURL, page);
         product.description = description;
-        product.overviews = overview;
+        product.overview = overview;
         delete product.descriptionURL;
     }
 

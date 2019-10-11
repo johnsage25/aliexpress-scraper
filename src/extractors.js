@@ -137,14 +137,14 @@ const getProductDescription = async (descriptionURL, page) => {
     return page.evaluate(async () => {
         return {
             description: Array.from(document.querySelectorAll('img')).map(img => img.src),
-            overview: document.querySelector('body'),
+            overview: document.querySelector('body').innerHTML,
         };
     });
 };
 
 
 // Fetch feedbacks recursively
-const getProductFeedbacks = async (userInput, id, url, companyId, memberId, currentPage = 1) => {
+const getProductFeedbacks = async (userInput, id, url, companyId, memberId, currentPage = 0) => {
     // Send request
     const { data } = await axios({
         method: 'POST',
