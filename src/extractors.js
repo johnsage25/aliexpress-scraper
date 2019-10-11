@@ -135,7 +135,10 @@ const getProductDescription = async (descriptionURL, page) => {
     await page.goto(descriptionURL, { timeout: 0 });
 
     return page.evaluate(async () => {
-        return Array.from(document.querySelectorAll('img')).map(img => img.src);
+        return {
+            description: Array.from(document.querySelectorAll('img')).map(img => img.src),
+            overview: document.querySelector('body'),
+        };
     });
 };
 

@@ -41,20 +41,34 @@ Apify.main(async () => {
             stealth: true,
             args: ['--lang=en-US,en'],
         }),
-        gotoFunction: async ({ request, page }) => {
+        gotoFunction: async ({ request, page, puppeteerPool }) => {
+            await Apify.utils.puppeteer.blockRequests(page, {
+                urlPatterns: ['.zip'],
+                includeDefaults: false,
+            });
+
             // goto options
-            return page.goto(request.url, {
+            const response = page.goto(request.url, {
                 timeout: 0,
                 waitUntil: 'load',
-            });
+            }).catch(() => null);
+
+            if (!response) {
+                await puppeteerPool.retire(page.browser());
+                throw new Error(`Page didn't load for ${request.url}`);
+            } else {
+                return response;
+            }
         },
         handlePageFunction: async (context) => {
-            const { request, response, page } = context;
+            const { request, response, page, puppeteerPool } = context;
             log.debug(`CRAWLER -- Processing ${request.url}`);
 
             // Status code check
-            const status = response.status();
-            if (status !== 200) return;
+            if (!response || response.status() !== 200) {
+                await puppeteerPool.retire(page.browser());
+                throw new Error(`We got blocked by target on ${request.url}`);
+            }
 
             // Add user input to context
             context.userInput = userInput;

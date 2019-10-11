@@ -109,7 +109,9 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
         await Promise.delay(Math.random() * 1000);
 
         // Fetch description
-        product.description = await extractors.getProductDescription(product.descriptionURL, page);
+        const { description, overview } = await extractors.getProductDescription(product.descriptionURL, page);
+        product.description = description;
+        product.overviews = overview;
         delete product.descriptionURL;
     }
 
