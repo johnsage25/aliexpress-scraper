@@ -67,7 +67,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
                     pageNum: pageNum + 1,
                     categoryBaseURL,
                 },
-            }, { forefront: true });
+            });
         }
 
 
@@ -80,7 +80,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
                     label: 'PRODUCT',
                     productId: productLink.id,
                 },
-            });
+            }, { forefront: true });
         }
     } else {
         // End of category with page
