@@ -52,7 +52,7 @@ const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, su
 
 // Fetch all products from a global object `runParams`
 const getProductsOfPage = async (page) => {
-    await page.waitForFunction('window.runParams !== null && window.runParams.items.length !== 0', { timeout: 120000 });
+    await page.waitForFunction('window.runParams !== null && window.runParams.items && window.runParams.items.length !== 0', { timeout: 120000 });
     return page.evaluate(async () => {
         const { items } = window.runParams;
         return items.map(product => ({
