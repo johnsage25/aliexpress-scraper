@@ -39,7 +39,6 @@ Apify.main(async () => {
             // Proxy options
             proxyUrl: tools.createProxyUrl(),
             userAgent: Apify.utils.getRandomUserAgent(),
-            headless: true,
             stealth: true,
             args: ['--lang=en-US,en'],
             ignoreHTTPSErrors: true,
@@ -67,8 +66,10 @@ Apify.main(async () => {
             const { request, response, page, puppeteerPool } = context;
             log.debug(`CRAWLER -- Processing ${request.url}`);
 
+
             // Status code check
-            if (!response || response.status() !== 200) {
+            const { dataset } = await page.$('body');
+            if (!response || response.status() !== 200 || (dataset && dataset.spm && dataset.spm === 'buyerloginandregister')) {
                 await puppeteerPool.retire(page.browser());
                 throw new Error(`We got blocked by target on ${request.url}`);
             }

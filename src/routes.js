@@ -67,7 +67,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
                     pageNum: pageNum + 1,
                     categoryBaseURL,
                 },
-            });
+            }, { forefront: true });
         }
 
 
@@ -80,7 +80,7 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
                     label: 'PRODUCT',
                     productId: productLink.id,
                 },
-            }, { forefront: true });
+            });
         }
     } else {
         // End of category with page
@@ -141,5 +141,6 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
     // Push data
     await Apify.pushData({ ...product });
 
+    await page.close();
     log.debug(`CRAWLER -- Fetching product: ${productId} completed and successfully pushed to dataset`);
 };

@@ -196,25 +196,28 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
         sellerReply: $(el).find('.seller-reply .r-fulltxt').text(),
     })).get();
 
+    const summary = $('.rate-list li').map((index, el) => ({
+        attribute: $(el).find('.r-title').text(),
+        value: $(el).find('.r-num').text(),
+    })).get();
+
     // Quit recursiveness
     if (feedbacks.length === 0) {
-        return [];
+        return {
+            summary,
+            feedbacks: [],
+        };
     }
 
     // Random delay
     await Promise.delay(Math.random() * 1000);
 
+    const nextFeedbacks = await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1);
+
     // Recursively call itself
     return {
-        summary: {
-            totalReviews: parseInt($('.customer-reviews').text().replace(/(Customer Reviews |\(|\))/g, ''), 10),
-            percentages: $('.rate-list li').map((index, el) => {
-                const obj = {};
-                obj[$(el).find('.r-title').text()] = $(el).find('.r-num').text();
-                return obj;
-            }).get(),
-        },
-        feedbacks: feedbacks.concat(await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1)),
+        summary,
+        feedbacks: feedbacks.concat(nextFeedbacks.feedbacks),
     };
 };
 
