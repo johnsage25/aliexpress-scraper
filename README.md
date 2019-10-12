@@ -33,10 +33,6 @@ An Apify actor that fetches restaurants from aliexpress.com. The actor can start
  	- Manually set the minimum concurrency for Puppeteer instance
 	- Not required.
 	- Default is `1`
-* liveView
-	- Enables live view option on Apify platform
-	- Not required.
-	- Default is `false`
 * country
 	- Helps you to set the localization of Aliexpress.
 	- Not required.

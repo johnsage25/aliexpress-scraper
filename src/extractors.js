@@ -52,7 +52,7 @@ const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, su
 
 // Fetch all products from a global object `runParams`
 const getProductsOfPage = async (page) => {
-    await page.waitForFunction('window.runParams !== null', { timeout: 120000 });
+    await page.waitForFunction('window.runParams !== null && window.runParams.items.length !== 0', { timeout: 120000 });
     return page.evaluate(async () => {
         const { items } = window.runParams;
         return items.map(product => ({
@@ -107,18 +107,18 @@ const getProductDetail = async page => page.evaluate(async () => {
         wishedCount: actionModule.itemWishedCount,
         quantity: actionModule.totalAvailQuantity,
         photos: imageModule.imagePathList,
-        skuOptions: skuModule.productSKUPropertyList
+        skuOptions: skuModule.productSKUPropertyList ? skuModule.productSKUPropertyList
             .map(skuOption => ({
                 name: skuOption.skuPropertyName,
                 values: skuOption.skuPropertyValues
                     .map(skuPropVal => skuPropVal.propertyValueDefinitionName),
-            })),
+            })) : [],
         prices: skuModule.skuPriceList.map(skuPriceItem => ({
             price: skuPriceItem.skuVal.skuAmount.formatedAmount,
             attributes: skuPriceItem.skuPropIds.split(',')
-                .map(propId => skuModule.productSKUPropertyList
+                .map(propId => (skuModule.productSKUPropertyList ? skuModule.productSKUPropertyList
                     .reduce((arr, obj) => { return arr.concat(obj.skuPropertyValues); }, [])
-                    .find(propVal => propVal.propertyValueId === parseInt(propId, 10)).propertyValueName),
+                    .find(propVal => propVal.propertyValueId === parseInt(propId, 10)).propertyValueName : null)),
         })),
         companyId: recommendModule.companyId,
         memberId: commonModule.sellerAdminSeq,
@@ -170,6 +170,7 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
     // Load it to cheerio
     const $ = cheerio.load(data);
 
+
     // Parse data and return
     const feedbacks = $('.feedback-item').map((i, el) => ({
         user: {
@@ -204,7 +205,17 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, curr
     await Promise.delay(Math.random() * 1000);
 
     // Recursively call itself
-    return feedbacks.concat(await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1));
+    return {
+        summary: {
+            totalReviews: parseInt($('.customer-reviews').text().replace(/(Customer Reviews |\(|\))/g, ''), 10),
+            percentages: $('.rate-list li').map((index, el) => {
+                const obj = {};
+                obj[$(el).find('.r-title').text()] = $(el).find('.r-num').text();
+                return obj;
+            }).get(),
+        },
+        feedbacks: feedbacks.concat(await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1)),
+    };
 };
 
 

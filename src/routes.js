@@ -108,6 +108,10 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
         // Delay in random
         await Promise.delay(Math.random() * 1000);
 
+
+        page.on('error', msg => console.log(msg));
+        page.on('pageerror', msg => console.log(msg));
+        page.on('console', msg => console.log(msg));
         // Fetch description
         const { description, overview } = await extractors.getProductDescription(product.descriptionURL, page);
         product.description = description;
@@ -121,7 +125,9 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
         await Promise.delay(Math.random() * 1000);
 
         // Get Feedbacks
-        product.feedbacks = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
+        const { summary, feedbacks } = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
+        product.feedbacks = feedbacks;
+        product.feedbackSummary = summary;
         delete product.companyId;
         delete product.memberId;
     }

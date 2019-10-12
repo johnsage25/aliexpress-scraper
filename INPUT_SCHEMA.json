@@ -18,13 +18,6 @@
             "editor": "number",
             "default": 1
         },
-        "liveView": {
-            "title": "Liveview",
-            "type": "boolean",
-            "description": "Live view option for crawler (Not recommended)",
-            "editor": "checkbox",
-            "default": false
-        },
         "startPage": {
             "title": "Category start page",
             "type": "integer",

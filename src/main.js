@@ -30,9 +30,11 @@ Apify.main(async () => {
         gotoTimeoutSecs: 120,
         handlePageTimeoutSecs: 99999,
         maxRequestRetries: 10,
+        maxOpenPagesPerInstance: 15,
+        retireInstanceAfterRequestCount: 30,
         maxConcurrency: userInput.maxConcurrency,
         minConcurrency: userInput.minConcurrency,
-        useLiveView: userInput.liveView,
+        ignoreHTTPSErrors: true,
         launchPuppeteerFunction: async () => Apify.launchPuppeteer({
             // Proxy options
             proxyUrl: tools.createProxyUrl(),
@@ -40,6 +42,7 @@ Apify.main(async () => {
             headless: true,
             stealth: true,
             args: ['--lang=en-US,en'],
+            ignoreHTTPSErrors: true,
         }),
         gotoFunction: async ({ request, page, puppeteerPool }) => {
             await Apify.utils.puppeteer.blockRequests(page, {
