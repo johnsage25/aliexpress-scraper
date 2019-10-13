@@ -37,7 +37,9 @@ Apify.main(async () => {
         ignoreHTTPSErrors: true,
         launchPuppeteerFunction: async () => Apify.launchPuppeteer({
             // Proxy options
-            proxyUrl: tools.createProxyUrl(),
+            ...(userInput.useApifyProxy ? { useApifyProxy: true } : {}),
+            ...(userInput.proxyUrls ? { proxyUrl: userInput.proxyUrls[0] } : {}),
+            ...(userInput.apifyProxyGroups ? { proxyUrl: await tools.createProxyUrl() } : {}),
             userAgent: Apify.utils.getRandomUserAgent(),
             stealth: true,
             args: ['--lang=en-US,en'],

@@ -66,6 +66,13 @@
             "description": "Include description for products. It might slow the process a bit",
             "editor": "checkbox",
             "default": false
+        },
+        "proxy":{
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Select proxies to be used by your crawler.",
+            "prefill": { "useApifyProxy": true },
+            "editor": "proxy"
         }
     }
 }
