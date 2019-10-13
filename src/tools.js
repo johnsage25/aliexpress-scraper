@@ -29,11 +29,20 @@ exports.createRouter = (globalContext) => {
 
 // Creates proxy URL with user input
 exports.createProxyUrl = async () => {
-    const { apifyProxyGroups } = await Apify.getInput();
-    return `http://${apifyProxyGroups.join(',') || 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
+    const { apifyProxyGroups, useApifyProxy, proxyUrls } = await Apify.getInput();
+    if (proxyUrls && proxyUrls.length > 0) {
+        return proxyUrls[0];
+    }
+
+    if (useApifyProxy) {
+        return `http://${apifyProxyGroups.join(',') || 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
+    }
+
+    return '';
 };
 
 // Returns an axios instance with proxy and timeout options set
-exports.getProxyAgent = () => {
-    return new HttpsProxyAgent(this.createProxyUrl());
+exports.getProxyAgent = async () => {
+    const url = await this.createProxyUrl();
+    return new HttpsProxyAgent(url);
 };
