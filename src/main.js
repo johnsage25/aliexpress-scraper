@@ -70,8 +70,7 @@ Apify.main(async () => {
 
 
             // Status code check
-            const { dataset } = await page.$('body');
-            if (!response || response.status() !== 200 || (dataset && dataset.spm && dataset.spm === 'buyerloginandregister')) {
+            if (!response || response.status() !== 200 || request.url.includes('login.')) {
                 await puppeteerPool.retire(page.browser());
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
