@@ -30,7 +30,7 @@ exports.createRouter = (globalContext) => {
 // Creates proxy URL with user input
 exports.createProxyUrl = async () => {
     const { apifyProxyGroups } = await Apify.getInput();
-    return `http://${apifyProxyGroups || 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
+    return `http://${apifyProxyGroups.join(',') || 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
 };
 
 // Returns an axios instance with proxy and timeout options set
