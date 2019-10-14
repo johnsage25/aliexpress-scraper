@@ -25,61 +25,28 @@ Apify.main(async () => {
     const router = tools.createRouter({ requestQueue });
 
     log.info('PHASE -- SETTING UP CRAWLER.');
-    const crawler = new Apify.PuppeteerCrawler({
+    const crawler = new Apify.CheerioCrawler({
         requestQueue,
-        gotoTimeoutSecs: 120,
         handlePageTimeoutSecs: 99999,
         maxRequestRetries: 10,
-        maxOpenPagesPerInstance: 15,
-        retireInstanceAfterRequestCount: 30,
         maxConcurrency: userInput.maxConcurrency,
         minConcurrency: userInput.minConcurrency,
-        ignoreHTTPSErrors: true,
-        launchPuppeteerFunction: async () => Apify.launchPuppeteer({
-            // Proxy options
-            ...(userInput.useApifyProxy ? { useApifyProxy: userInput.useApifyProxy } : {}),
-            ...(userInput.apifyProxyGroups ? { apifyProxyGroups: userInput.apifyProxyGroups } : {}),
-            ...(userInput.proxyUrls ? { proxyUrl: userInput.proxyUrls[0] } : {}),
-            userAgent: Apify.utils.getRandomUserAgent(),
-            stealth: true,
-            args: ['--lang=en-US,en'],
-            ignoreHTTPSErrors: true,
-        }),
-        gotoFunction: async ({ request, page, puppeteerPool }) => {
-            await Apify.utils.puppeteer.blockRequests(page, {
-                urlPatterns: ['.zip'],
-                includeDefaults: false,
-            });
-
-            // goto options
-            const response = page.goto(request.url, {
-                timeout: 0,
-                waitUntil: 'load',
-            }).catch(() => null);
-
-            if (!response) {
-                await puppeteerPool.retire(page.browser());
-                throw new Error(`Page didn't load for ${request.url}`);
-            } else {
-                return response;
-            }
-        },
+        ignoreSslErrors: true,
+        // Proxy options
+        ...(userInput.useApifyProxy ? { useApifyProxy: userInput.useApifyProxy } : {}),
+        ...(userInput.apifyProxyGroups ? { apifyProxyGroups: userInput.apifyProxyGroups } : {}),
+        ...(userInput.proxyUrls ? { proxyUrls: userInput.proxyUrls } : {}),
         handlePageFunction: async (context) => {
-            const { request, response, page, puppeteerPool } = context;
+            const { request, response, $ } = context;
             log.debug(`CRAWLER -- Processing ${request.url}`);
 
-
             // Status code check
-            if (!response || response.status() !== 200 || request.url.includes('login.')) {
-                await puppeteerPool.retire(page.browser());
+            if (!response || response.statusCode !== 200 || request.url.includes('login.') || !$('body').data() || $('body').data('spm') === 'buyerloginandregister') {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
             // Add user input to context
             context.userInput = userInput;
-
-            // Random delay
-            await page.waitFor(Math.random() * 1000);
 
             // Redirect to route
             await router(request.userData.label, context);

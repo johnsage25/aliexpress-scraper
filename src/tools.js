@@ -35,7 +35,7 @@ exports.createProxyUrl = async () => {
     }
 
     if (useApifyProxy) {
-        return `http://${apifyProxyGroups.join(',') || 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
+        return `http://${apifyProxyGroups ? apifyProxyGroups.join(',') : 'auto'}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`;
     }
 
     return '';

@@ -11,16 +11,16 @@ const {
 // Home page crawler.
 // Checks user input and create category links
 // Adds categories to request queue
-exports.HOME = async ({ page, userInput, request }, { requestQueue }) => {
+exports.HOME = async ({ $, userInput, request }, { requestQueue }) => {
     const { startPage = 0, categoryStartIndex = 0, categoryEndIndex = null } = userInput;
 
     log.info('CRAWLER -- Fetching Categories');
 
     // Extract all categories
-    const mainCategoryPaths = await extractors.getAllMainCategoryPaths(page);
+    const mainCategoryPaths = await extractors.getAllMainCategoryPaths($);
 
     // Get all subcategory links
-    const subCategories = await extractors.getAllSubCategories(request.url, mainCategoryPaths, page);
+    const subCategories = await extractors.getAllSubCategories(request.url, mainCategoryPaths);
 
     log.info(`CRAWLER -- Fetched total of ${subCategories.length} categories`);
 
@@ -30,7 +30,7 @@ exports.HOME = async ({ page, userInput, request }, { requestQueue }) => {
     // Adding all subcategory links to queue
     for (const filteredSubCategory of filteredSubCategories) {
         await requestQueue.addRequest({
-            url: `${filteredSubCategory}?SortType=total_tranpro_desc`,
+            url: `https:${filteredSubCategory}?SortType=total_tranpro_desc`,
             userData: {
                 label: 'CATEGORY',
                 pageNum: startPage || 1,
@@ -46,14 +46,14 @@ exports.HOME = async ({ page, userInput, request }, { requestQueue }) => {
 // Categoy page crawler
 // Add next page on request queue
 // Fetch products from list and add all links to request queue
-exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
+exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
     const { endPage = -1 } = userInput;
     const { pageNum = 1, categoryBaseURL } = request.userData;
 
     log.info(`CRAWLER -- Fetching category: ${request.url} with page: ${pageNum}`);
 
     // Extract product links
-    const productLinks = await extractors.getProductsOfPage(page);
+    const productLinks = await extractors.getProductsOfPage($);
 
     // If products are more than 0
     if (productLinks.length > 0) {
@@ -94,23 +94,22 @@ exports.CATEGORY = async ({ page, userInput, request }, { requestQueue }) => {
 
 // Product page crawler
 // Fetches product detail from detail page
-exports.PRODUCT = async ({ page, userInput, request }) => {
+exports.PRODUCT = async ({ $, userInput, request }) => {
     const { productId } = request.userData;
     const { includeQuestions = false, includeFeedbacks = false, includeDescription = false } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
     // Fetch product details
-    const product = await extractors.getProductDetail(page);
+    const product = await extractors.getProductDetail($, request.url);
 
     // Check description option
     if (includeDescription) {
         // Delay in random
         await Promise.delay(Math.random() * 1000);
 
-
         // Fetch description
-        const { description, overview } = await extractors.getProductDescription(product.descriptionURL, page);
+        const { description, overview } = await extractors.getProductDescription(product.descriptionURL);
         product.description = description;
         product.overview = overview;
         delete product.descriptionURL;
@@ -141,6 +140,6 @@ exports.PRODUCT = async ({ page, userInput, request }) => {
     // Push data
     await Apify.pushData({ ...product });
 
-    await page.close();
+    // await page.close();
     log.debug(`CRAWLER -- Fetching product: ${productId} completed and successfully pushed to dataset`);
 };

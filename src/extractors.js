@@ -1,44 +1,38 @@
 const Apify = require('apify');
 const axios = require('axios');
-const Promise = require('bluebird');
 const uniqBy = require('lodash/uniqBy');
 const qs = require('querystring');
 const cheerio = require('cheerio');
+const Promise = require('bluebird');
+const safeEval = require('safe-eval');
 const tools = require('./tools');
 
 // Fetch all main category paths from homepage
-const getAllMainCategoryPaths = async page => page.evaluate(async () => {
-    return Array.from(
-        document.querySelectorAll('.categories-list-box .cl-item .sub-cate'),
-    ).map(subCategory => subCategory.dataset.path);
-});
-
+const getAllMainCategoryPaths = ($) => {
+    return $('dd.sub-cate').map((i, el) => $(el).data('path')).get();
+};
 
 // Fetch every subcategory hidden pages (loaders)
-const getAllSubCategories = async (base, mainCategoryPaths, page) => {
+const getAllSubCategories = async (base, mainCategoryPaths) => {
     let subCategories = [];
 
     // Fetch all subcategories
     for (const categoryPath of mainCategoryPaths) {
-        // Random delay
-        await page.waitFor(Math.random() * 1000);
+        // Fetch subcategory page
+        const { data } = await axios.get(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0 });
 
-        // Go to subcategory page
-        await page.goto(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0 });
+        // Load to cheerio
+        const temp$ = cheerio.load(data);
 
         // Fetch links
-        subCategories = subCategories.concat(
-            await page.evaluate(async () => {
-                return Array.from(
-                    document.querySelectorAll('a'),
-                ).map(el => el.href.split('?')[0]).filter(link => /\/category\//.test(link));
-            }),
-        );
+        subCategories = subCategories
+            .concat(temp$('a')
+                .map((i, el) => temp$(el).attr('href').split('?')[0]).get()
+                .filter(link => /\/category\//.test(link)));
     }
 
     return uniqBy(subCategories);
 };
-
 
 // Filters sub categories with given options
 const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, subCategories) => {
@@ -49,22 +43,21 @@ const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, su
     return subCategories.slice(categoryStartIndex, endIndex);
 };
 
-
 // Fetch all products from a global object `runParams`
-const getProductsOfPage = async (page) => {
-    await page.waitForFunction('window.runParams !== null && window.runParams.items && window.runParams.items.length !== 0', { timeout: 120000 });
-    return page.evaluate(async () => {
-        const { items } = window.runParams;
-        return items.map(product => ({
-            id: product.productId,
-            link: product.productDetailUrl.split('?')[0],
-        }));
-    });
+const getProductsOfPage = ($) => {
+    const dataScript = $($('script').filter((i, script) => $(script).html().includes('runParams')).get()[0]).html();
+
+    return JSON.parse(
+        dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(';', ''),
+    ).items.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl }));
 };
 
-
 // Fetch basic product detail from a global object `runParams`
-const getProductDetail = async page => page.evaluate(async () => {
+const getProductDetail = ($, url) => {
+    const dataScript = $($('script').filter((i, script) => $(script).html().includes('runParams')).get()[0]).html();
+
+    const { data } = safeEval(dataScript.split('window.runParams = ')[1].split('var GaData')[0].replace(/;/g, ''));
+
     const {
         actionModule,
         titleModule,
@@ -76,12 +69,12 @@ const getProductDetail = async page => page.evaluate(async () => {
         crossLinkModule,
         recommendModule,
         commonModule,
-    } = window.runParams.data;
+    } = data;
 
 
     return {
         id: actionModule.productId,
-        link: window.location.href,
+        link: url,
         title: titleModule.subject,
         tradeAmount: `${titleModule.tradeCount ? titleModule.tradeCount : ''} ${titleModule.tradeCountUnit ? titleModule.tradeCountUnit : ''}`,
         averageStar: titleModule.feedbackRating.averageStar,
@@ -123,23 +116,25 @@ const getProductDetail = async page => page.evaluate(async () => {
         companyId: recommendModule.companyId,
         memberId: commonModule.sellerAdminSeq,
     };
-});
+};
 
 
 // Get description HTML of product
-const getProductDescription = async (descriptionURL, page) => {
-    // Random delay
-    await page.waitFor(Math.random() * 1000);
-
-    // Fetch description HTML
-    await page.goto(descriptionURL, { timeout: 0 });
-
-    return page.evaluate(async () => {
-        return {
-            description: Array.from(document.querySelectorAll('img')).map(img => img.src),
-            overview: document.querySelector('body').innerHTML,
-        };
+const getProductDescription = async (descriptionURL) => {
+    const { data } = await axios({
+        method: 'GET',
+        url: descriptionURL,
+        agent: tools.getProxyAgent(),
+        withCredentials: true,
     });
+
+    const temp$ = cheerio.load(data);
+
+
+    return {
+        description: temp$('img').map((i, img) => temp$(img).attr('src')).get(),
+        overview: temp$.html(),
+    };
 };
 
 
