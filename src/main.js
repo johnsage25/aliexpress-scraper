@@ -33,9 +33,9 @@ Apify.main(async () => {
         minConcurrency: userInput.minConcurrency,
         ignoreSslErrors: true,
         // Proxy options
-        ...(userInput.useApifyProxy ? { useApifyProxy: userInput.useApifyProxy } : {}),
-        ...(userInput.apifyProxyGroups ? { apifyProxyGroups: userInput.apifyProxyGroups } : {}),
-        ...(userInput.proxyUrls ? { proxyUrls: userInput.proxyUrls } : {}),
+        ...(userInput.proxy.useApifyProxy ? { useApifyProxy: userInput.proxy.useApifyProxy } : {}),
+        ...(userInput.proxy.apifyProxyGroups ? { apifyProxyGroups: userInput.proxy.apifyProxyGroups } : {}),
+        ...(userInput.proxy.proxyUrls ? { proxyUrls: userInput.proxy.proxyUrls } : {}),
         handlePageFunction: async (context) => {
             const { request, response, $ } = context;
             log.debug(`CRAWLER -- Processing ${request.url}`);
