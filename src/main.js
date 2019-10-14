@@ -41,7 +41,10 @@ Apify.main(async () => {
             log.debug(`CRAWLER -- Processing ${request.url}`);
 
             // Status code check
-            if (!response || response.statusCode !== 200 || request.url.includes('login.') || !$('body').data() || $('body').data('spm') === 'buyerloginandregister') {
+            if (!response || response.statusCode !== 200
+                || request.url.includes('login.')
+                || !$('body').data()
+                || $('body').data('spm') === 'buyerloginandregister') {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
