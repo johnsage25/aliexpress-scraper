@@ -3,9 +3,7 @@ const axios = require('axios');
 const uniqBy = require('lodash/uniqBy');
 const qs = require('querystring');
 const cheerio = require('cheerio');
-const Promise = require('bluebird');
 const safeEval = require('safe-eval');
-const tools = require('./tools');
 
 // Fetch all main category paths from homepage
 const getAllMainCategoryPaths = ($) => {
@@ -120,11 +118,11 @@ const getProductDetail = ($, url) => {
 
 
 // Get description HTML of product
-const getProductDescription = async (descriptionURL) => {
+const getProductDescription = async (descriptionURL, agent) => {
     const { data } = await axios({
         method: 'GET',
         url: descriptionURL,
-        agent: tools.getProxyAgent(),
+        agent,
         withCredentials: true,
     });
 
@@ -139,113 +137,113 @@ const getProductDescription = async (descriptionURL) => {
 
 
 // Fetch feedbacks recursively
-const getProductFeedbacks = async (userInput, id, url, companyId, memberId, currentPage = 0) => {
-    // Send request
-    const { data } = await axios({
-        method: 'POST',
-        url: 'https://feedback.aliexpress.com/display/productEvaluation.htm',
-        headers: {
-            'User-Agent': Apify.utils.getRandomUserAgent(),
-            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-        },
-        agent: tools.getProxyAgent(),
-        withCredentials: true,
-        data: qs.stringify({
-            withAdditionalFeedback: false,
-            withPersonalInfo: false,
-            withPictures: false,
-            i18n: true,
-            currentPage,
-            page: currentPage + 1,
-            productId: id,
-            ownerMemberId: memberId,
-        }),
-    });
+const getProductFeedbacks = async (userInput, id, url, companyId, memberId, agent) => {
+    let currentPage = 0;
+    let summary;
+    const fullFeedbacks = [];
 
-    // Load it to cheerio
-    const $ = cheerio.load(data);
+    while (true) {
+        // Send request
+        const { data } = await axios({
+            method: 'POST',
+            url: 'https://feedback.aliexpress.com/display/productEvaluation.htm',
+            headers: {
+                'User-Agent': Apify.utils.getRandomUserAgent(),
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            agent,
+            withCredentials: true,
+            data: qs.stringify({
+                withAdditionalFeedback: false,
+                withPersonalInfo: false,
+                withPictures: false,
+                i18n: true,
+                currentPage,
+                page: currentPage + 1,
+                productId: id,
+                ownerMemberId: memberId,
+            }),
+        });
 
+        // Load it to cheerio
+        const $ = cheerio.load(data);
 
-    // Parse data and return
-    const feedbacks = $('.feedback-item').map((i, el) => ({
-        user: {
-            name: $(el).find('.user-name a').text(),
-            country: $(el).find('.user-country b').text(),
-        },
-        rating: parseInt(
-            $(el).find('.f-rate-info .star-view span')
-                .attr('style')
-                .replace('width:', '', '%', ''), 10,
-        ) * 5 / 100,
-        specs: $(el).find('.user-order-info span')
-            .map((si, spec) => $(spec).text().replace(/(\n|\t)/g, '').replace(/  +/g, ' ')
-                .trim()).get(),
-        date: $(el).find('.r-time').text(),
-        review: $(el).find('.buyer-feedback span:not(.r-time-new)').text(),
-        photos: $(el).find('.fb-main .f-content .buyer-review > .r-photo-list li').map((pi, photoItem) => $(photoItem).data('src')).get(),
-        additionalFeedback: {
-            text: $(el).find('.buyer-additional-review .buyer-addition-feedback').text(),
-            photos: $(el).find('.buyer-additional-review .r-photo-list li')
-                .map((ai, photoItem) => $(photoItem).data('src')).get(),
-        },
-        sellerReply: $(el).find('.seller-reply .r-fulltxt').text(),
-    })).get();
+        // Parse data and return
+        const feedbacks = $('.feedback-item').map((i, el) => ({
+            user: {
+                name: $(el).find('.user-name a').text(),
+                country: $(el).find('.user-country b').text(),
+            },
+            rating: parseInt(
+                $(el).find('.f-rate-info .star-view span')
+                    .attr('style')
+                    .replace('width:', '', '%', ''), 10,
+            ) * 5 / 100,
+            specs: $(el).find('.user-order-info span')
+                .map((si, spec) => $(spec).text().replace(/(\n|\t)/g, '').replace(/  +/g, ' ')
+                    .trim()).get(),
+            date: $(el).find('.r-time').text(),
+            review: $(el).find('.buyer-feedback span:not(.r-time-new)').text(),
+            photos: $(el).find('.fb-main .f-content .buyer-review > .r-photo-list li').map((pi, photoItem) => $(photoItem).data('src')).get(),
+            additionalFeedback: {
+                text: $(el).find('.buyer-additional-review .buyer-addition-feedback').text(),
+                photos: $(el).find('.buyer-additional-review .r-photo-list li')
+                    .map((ai, photoItem) => $(photoItem).data('src')).get(),
+            },
+            sellerReply: $(el).find('.seller-reply .r-fulltxt').text(),
+        })).get();
 
-    const summary = $('.rate-list li').map((index, el) => ({
-        attribute: $(el).find('.r-title').text(),
-        value: $(el).find('.r-num').text(),
-    })).get();
+        if (!summary) {
+            summary = $('.rate-list li').map((index, el) => ({
+                attribute: $(el).find('.r-title').text(),
+                value: $(el).find('.r-num').text(),
+            })).get();
+        }
+        // Quit recursiveness
+        if (feedbacks.length === 0) {
+            return {
+                summary,
+                feedbacks: fullFeedbacks,
+            };
+        }
 
-    // Quit recursiveness
-    if (feedbacks.length === 0) {
-        return {
-            summary,
-            feedbacks: [],
-        };
+        fullFeedbacks.push(...feedbacks);
+        currentPage++;
     }
-
-    // Random delay
-    await Promise.delay(Math.random() * 1000);
-
-    const nextFeedbacks = await getProductFeedbacks(userInput, id, url, companyId, memberId, currentPage + 1);
-
-    // Recursively call itself
-    return {
-        summary,
-        feedbacks: feedbacks.concat(nextFeedbacks.feedbacks),
-    };
 };
 
 
 // Fetch product questions recursively
-const getProductQuestions = async (userInput, id, url, currentPage = 1) => {
+const getProductQuestions = async (userInput, id, url, agent) => {
+    const fullQuestions = [];
+    let currentPage = 1;
     // Send request
-    const { data } = await axios({
-        method: 'GET',
-        url: `https://www.aliexpress.com/aeglodetailweb/api/questions?productId=${id}&currentPage=${currentPage}&pageSize=500`,
-        headers: {
-            'User-Agent': Apify.utils.getRandomUserAgent(),
-            referer: url,
-            Accept: '*/*',
-            'Cache-Control': 'no-cache',
-            Host: 'www.aliexpress.com',
-        },
-        agent: tools.getProxyAgent(),
-        withCredentials: true,
-    });
+    while (true) {
+        const { data } = await axios({
+            method: 'GET',
+            url: `https://www.aliexpress.com/aeglodetailweb/api/questions?productId=${id}&currentPage=${currentPage}&pageSize=500`,
+            headers: {
+                'User-Agent': Apify.utils.getRandomUserAgent(),
+                referer: url,
+                Accept: '*/*',
+                'Cache-Control': 'no-cache',
+                Host: 'www.aliexpress.com',
+            },
+            agent,
+            withCredentials: true,
+        });
 
-    // Quit recursion
-    if (!data || !data.body || !data.body.questionList || data.body.questionList.length === 0) {
-        return [];
+        // Quit recursion
+        if (!data || !data.body || !data.body.questionList || data.body.questionList.length === 0) {
+            return fullQuestions;
+        }
+
+        const questions = data.body.questionList;
+
+        // Recursively continue;
+        fullQuestions.push(...questions);
+        currentPage++;
     }
-
-    // Random delay
-    await Promise.delay(Math.random() * 1000);
-
-    const questions = data.body.questionList;
-
-    // Recursively continue;
-    return questions.concat(await getProductQuestions(userInput, id, url, currentPage + 1));
 };
 
 

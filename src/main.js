@@ -21,6 +21,8 @@ Apify.main(async () => {
     const homepage = await tools.getSources();
     await requestQueue.addRequest({ ...homepage });
 
+    const agent = await tools.getProxyAgent();
+
     // Create route
     const router = tools.createRouter({ requestQueue });
 
@@ -50,6 +52,7 @@ Apify.main(async () => {
 
             // Add user input to context
             context.userInput = userInput;
+            context.agent = agent;
 
             // Redirect to route
             await router(request.userData.label, context);

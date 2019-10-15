@@ -1,6 +1,5 @@
 // routes.js
 const Apify = require('apify');
-const Promise = require('bluebird');
 const extractors = require('./extractors');
 
 const {
@@ -94,47 +93,47 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
 
 // Product page crawler
 // Fetches product detail from detail page
-exports.PRODUCT = async ({ $, userInput, request }) => {
+exports.PRODUCT = async ({ $, userInput, request, agent }) => {
     const { productId } = request.userData;
     const { includeQuestions = false, includeFeedbacks = false, includeDescription = false } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
     // Fetch product details
-    const product = await extractors.getProductDetail($, request.url);
+    const product = await extractors.getProductDetail($, request.url, agent);
 
     // Check description option
     if (includeDescription) {
         // Delay in random
-        await Promise.delay(Math.random() * 1000);
 
         // Fetch description
         const { description, overview } = await extractors.getProductDescription(product.descriptionURL);
         product.description = description;
         product.overview = overview;
         delete product.descriptionURL;
+        console.log(`Description fetched --- ${request.url}`);
     }
 
     // Check feedback option
     if (includeFeedbacks) {
         // Delay in random
-        await Promise.delay(Math.random() * 1000);
 
         // Get Feedbacks
-        const { summary, feedbacks } = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId);
+        const { summary, feedbacks } = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId, agent);
         product.feedbacks = feedbacks;
         product.feedbackSummary = summary;
         delete product.companyId;
         delete product.memberId;
+        console.log(`Feedbacks fetched --- ${request.url}`);
     }
 
     // Check question option
     if (includeQuestions) {
         // Delay in random
-        await Promise.delay(Math.random() * 1000);
 
         // Fetch questions
-        product.questions = await extractors.getProductQuestions(userInput, productId, request.url);
+        product.questions = await extractors.getProductQuestions(userInput, productId, request.url, agent);
+        console.log(`Questions fetched --- ${request.url}`);
     }
 
     // Push data
