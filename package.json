@@ -1,5 +1,5 @@
 {
-	"name": "apify-aliexpress-actor",
+	"name": "apify-aliexpress",
 	"version": "0.0.1",
 	"description": "Aliexpress.com scraper.",
 	"dependencies": {

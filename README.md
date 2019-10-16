@@ -29,14 +29,6 @@ An Apify actor that fetches restaurants from aliexpress.com. The actor can start
 	- Manually set the maximum concurrency for Puppeteer instance
 	- Not required.
 	- Default is `500`
-* minConcurrency
- 	- Manually set the minimum concurrency for Puppeteer instance
-	- Not required.
-	- Default is `1`
-* country
-	- Helps you to set the localization of Aliexpress.
-	- Not required.
-	- Default is `US`
 * startPage
 	- Manually set the start page for each category.
 	- Not required.
@@ -53,6 +45,23 @@ An Apify actor that fetches restaurants from aliexpress.com. The actor can start
 	- Manually set the end index for categories.
 	- Not required.
 	- Default is `null`
+* includeQuestions
+	- Includes questions on the results of each product. Might be a bit slower than before because it sends an extra request.
+	- Not required.
+	- Default is `false`
+* includeFeedbacks
+	- Includes feedbacks on the results of each product. Might be a bit slower than before because it sends an extra request.
+	- Not required.
+	- Default is `false`
+* includeDescription
+	- Includes description on the results of each product. Might be a bit slower than before because it sends an extra request.
+	- Not required.
+	- Default is `false`
+* proxy
+  - Proxy configuration
+  - Not required
+  - Default is `{}`
+
 
 
 <a name="notes"></a>

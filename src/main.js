@@ -32,7 +32,6 @@ Apify.main(async () => {
         handlePageTimeoutSecs: 99999,
         maxRequestRetries: 10,
         maxConcurrency: userInput.maxConcurrency,
-        minConcurrency: userInput.minConcurrency,
         ignoreSslErrors: true,
         // Proxy options
         ...(userInput.proxy.useApifyProxy ? { useApifyProxy: userInput.proxy.useApifyProxy } : {}),

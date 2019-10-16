@@ -46,7 +46,7 @@ const getProductsOfPage = ($) => {
     const dataScript = $($('script').filter((i, script) => $(script).html().includes('runParams')).get()[0]).html();
 
     return JSON.parse(
-        dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(';', ''),
+        dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(/;/g, ''),
     ).items.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl }));
 };
 
