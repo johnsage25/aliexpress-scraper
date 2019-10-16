@@ -50,6 +50,10 @@ Apify.main(async () => {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
+            if (request.userData.label !== 'HOME' && $('script').text().includes('runParams').length === 0) {
+                throw new Error(`We got blocked by target on ${request.url}`);
+            }
+
             // Add user input to context
             context.userInput = userInput;
             context.agent = agent;
