@@ -22,8 +22,7 @@
             "title": "Category end page",
             "type": "integer",
             "description": "The page number that you want to end with. By default there is no end page.",
-            "editor": "number",
-            "default": -1
+            "editor": "number"
         },
         "categoryStartIndex": {
             "title": "Category start index",
@@ -36,8 +35,7 @@
             "title": "Category end index",
             "type": "integer",
             "description": "Category index that you want to end with. You can limit crawling categories with that attribute. By default there is no end index.",
-            "editor": "number",
-            "default": -1
+            "editor": "number"
         },
         "includeQuestions": {
             "title": "Questions",
