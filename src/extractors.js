@@ -17,7 +17,7 @@ const getAllSubCategories = async (base, mainCategoryPaths) => {
     // Fetch all subcategories
     for (const categoryPath of mainCategoryPaths) {
         // Fetch subcategory page
-        const { data } = await axios.get(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0 });
+        const { data } = await axios.get(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0, rejectUnauthorized: false });
 
         // Load to cheerio
         const temp$ = cheerio.load(data);
@@ -124,6 +124,7 @@ const getProductDescription = async (descriptionURL, agent) => {
         url: descriptionURL,
         agent,
         withCredentials: true,
+        rejectUnauthorized: false,
     });
 
     const temp$ = cheerio.load(data);
@@ -163,6 +164,7 @@ const getProductFeedbacks = async (userInput, id, url, companyId, memberId, agen
                 productId: id,
                 ownerMemberId: memberId,
             }),
+            rejectUnauthorized: false,
         });
 
         // Load it to cheerio
@@ -231,6 +233,7 @@ const getProductQuestions = async (userInput, id, url, agent) => {
             },
             agent,
             withCredentials: true,
+            rejectUnauthorized: false,
         });
 
         // Quit recursion

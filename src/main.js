@@ -11,6 +11,7 @@ Apify.main(async () => {
     log.info('PHASE -- STARTING ACTOR.');
 
     const userInput = await Apify.getInput();
+    global.userInput = userInput;
 
     log.info('ACTOR OPTIONS: -- ', userInput);
 

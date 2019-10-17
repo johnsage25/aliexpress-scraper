@@ -29,7 +29,7 @@ exports.createRouter = (globalContext) => {
 
 // Creates proxy URL with user input
 exports.createProxyUrl = async () => {
-    const { apifyProxyGroups, useApifyProxy, proxyUrls } = await Apify.getInput();
+    const { apifyProxyGroups, useApifyProxy, proxyUrls } = global.userInput;
     if (proxyUrls && proxyUrls.length > 0) {
         return proxyUrls[0];
     }
