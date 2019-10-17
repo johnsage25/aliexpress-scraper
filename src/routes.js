@@ -36,7 +36,7 @@ exports.HOME = async ({ $, userInput, request, agent }, { requestQueue }) => {
                 pageNum: startPage || 1,
                 categoryBaseURL: `https:${filteredSubCategory}`,
             },
-        }, { forefront: true });
+        });
     }
 
     log.debug(`CRAWLER -- ${filteredSubCategories.length} categories added to queue`);
