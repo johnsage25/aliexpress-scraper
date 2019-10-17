@@ -67,7 +67,7 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
                     pageNum: pageNum + 1,
                     categoryBaseURL,
                 },
-            }, { forefront: true });
+            });
         }
 
 
@@ -80,7 +80,7 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
                     label: 'PRODUCT',
                     productId: productLink.id,
                 },
-            });
+            }, { forefront: true });
         }
     } else {
         // End of category with page
@@ -96,7 +96,7 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
 // Fetches product detail from detail page
 exports.PRODUCT = async ({ $, userInput, request }, { requestQueue }) => {
     const { productId } = request.userData;
-    const { includeDescription = false } = userInput;
+    const { includeDescription } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
@@ -107,13 +107,12 @@ exports.PRODUCT = async ({ $, userInput, request }, { requestQueue }) => {
     if (includeDescription) {
         // Fetch description
         await requestQueue.addRequest({
-            uniqueKey: `${product.id}-description`,
             url: product.descriptionURL,
             userData: {
                 label: 'DESCRIPTION',
                 product,
             },
-        });
+        }, { forefront: true });
     } else {
         // Push data
         await Apify.pushData({ ...product });
@@ -132,6 +131,7 @@ exports.DESCRIPTION = async ({ $, request }) => {
     // Fetch product details
     const description = await extractors.getProductDescription($);
     product.description = description;
+    delete product.descriptionURL;
 
     // Push data
     await Apify.pushData({ ...product });

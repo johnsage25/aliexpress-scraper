@@ -54,12 +54,12 @@ Apify.main(async () => {
             // Status code check
             if (!response || response.statusCode !== 200
                 || request.url.includes('login.')
-                || !$('body').data()
                 || $('body').data('spm') === 'buyerloginandregister') {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
-            if (request.userData.label !== 'HOME' && !$('script').text().includes('runParams')) {
+            if (request.userData.label !== 'HOME' && request.userData.label !== 'DESCRIPTION'
+                && !$('script').text().includes('runParams')) {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
