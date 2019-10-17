@@ -17,9 +17,16 @@ Apify.main(async () => {
     // Create request queue
     const requestQueue = await Apify.openRequestQueue();
 
+
     // Initialize first request
-    const homepage = await tools.getSources();
-    await requestQueue.addRequest({ ...homepage });
+    await requestQueue.addRequest({
+        uniqueKey: userInput.categoryLink,
+        url: userInput.categoryLink,
+        userData: {
+            label: 'CATEGORY',
+            baseUrl: userInput.categoryLink,
+        },
+    });
 
     const agent = await tools.getProxyAgent(userInput);
 
@@ -58,8 +65,7 @@ Apify.main(async () => {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
-            if (request.userData.label !== 'HOME' && request.userData.label !== 'DESCRIPTION'
-                && !$('script').text().includes('runParams')) {
+            if (request.userData.label !== 'DESCRIPTION' && !$('script').text().includes('runParams')) {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 

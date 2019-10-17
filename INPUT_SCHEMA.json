@@ -4,13 +4,6 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "maxConcurrency": {
-            "title": "Maximum Concurrency",
-            "type": "integer",
-            "description": "Maximum concurrency that you want to run actor",
-            "editor": "number",
-            "default": 500
-        },
         "startPage": {
             "title": "Category start page",
             "type": "integer",
@@ -24,18 +17,11 @@
             "description": "The page number that you want to end with. By default there is no end page.",
             "editor": "number"
         },
-        "categoryStartIndex": {
-            "title": "Category start index",
+        "categoryLink": {
+            "title": "Category Link",
             "type": "integer",
-            "description": "Category index that you want to start on. You can limit crawling categories with that attribute",
-            "editor": "number",
-            "default": 0
-        },
-        "categoryEndIndex": {
-            "title": "Category end index",
-            "type": "integer",
-            "description": "Category index that you want to end with. You can limit crawling categories with that attribute. By default there is no end index.",
-            "editor": "number"
+            "description": "Category that you want to crawl",
+            "editor": "textfield"
         },
         "includeDescription": {
             "title": "Description",
@@ -51,5 +37,6 @@
             "prefill": { "useApifyProxy": true },
             "editor": "proxy"
         }
-    }
+    },
+    "required":["categoryLink"]
 }

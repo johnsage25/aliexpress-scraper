@@ -1,8 +1,5 @@
-const Apify = require('apify');
-const axios = require('axios');
-const uniqBy = require('lodash/uniqBy');
-const cheerio = require('cheerio');
 const safeEval = require('safe-eval');
+const flattenDeep = require('lodash/flattenDeep');
 
 // Fetch all main category paths from homepage
 const getAllMainCategoryPaths = ($) => {
@@ -10,36 +7,16 @@ const getAllMainCategoryPaths = ($) => {
 };
 
 // Fetch every subcategory hidden pages (loaders)
-const getAllSubCategories = async (base, mainCategoryPaths, agent) => {
-    let subCategories = [];
+const getAllSubCategories = async ($) => {
+    const dataScript = $($('script').filter((i, script) => $(script).html().includes('runParams')).get()[0]).html();
 
-    // Fetch all subcategories
-    for (const categoryPath of mainCategoryPaths) {
-        // Fetch subcategory page
-        const { data } = await axios.get(
-            `${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`,
-            {
-                headers: {
-                    Connection: 'keep-alive',
-                    'User-Agent': Apify.utils.getRandomUserAgent(),
-                },
-                timeout: 0,
-                rejectUnauthorized: false,
-                agent,
-            },
-        );
+    const data = flattenDeep(JSON.parse(
+        dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(/;/g, ''),
+    ).refineCategory
+        .map(category => category.childCategories))
+        .filter(el => el).map(item => ({ name: item.categoryName, link: `https:${item.categoryUrl}` }));
 
-        // Load to cheerio
-        const temp$ = cheerio.load(data);
-
-        // Fetch links
-        subCategories = subCategories
-            .concat(temp$('a')
-                .map((i, el) => temp$(el).attr('href').split('?')[0]).get()
-                .filter(link => /\/category\//.test(link)));
-    }
-
-    return uniqBy(subCategories);
+    return data;
 };
 
 // Filters sub categories with given options

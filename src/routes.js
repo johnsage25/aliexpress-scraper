@@ -6,47 +6,51 @@ const {
     utils: { log },
 } = Apify;
 
+// Categoy page crawler
+// Add next page on request queue
+// Fetch products from list and add all links to request queue
+exports.CATEGORY = async ({ $, request }, { requestQueue }) => {
+    const { baseUrl } = request.userData;
 
-// Home page crawler.
-// Checks user input and create category links
-// Adds categories to request queue
-exports.HOME = async ({ $, userInput, request, agent }, { requestQueue }) => {
-    const { startPage = 0, categoryStartIndex = 0, categoryEndIndex = null } = userInput;
+    log.info(`CRAWLER -- Fetching category link: ${request.url}`);
 
-    log.info('CRAWLER -- Fetching Categories');
+    // Extract sub category links
+    const subCategories = await extractors.getAllSubCategories($);
 
-    // Extract all categories
-    const mainCategoryPaths = await extractors.getAllMainCategoryPaths($);
-
-    // Get all subcategory links
-    const subCategories = await extractors.getAllSubCategories(request.url, mainCategoryPaths, agent);
-
-    log.info(`CRAWLER -- Fetched total of ${subCategories.length} categories`);
-
-    // Filter categories if needed
-    const filteredSubCategories = extractors.filterSubCategories(categoryStartIndex, categoryEndIndex, subCategories);
-
-
-    // Adding all subcategory links to queue
-    for (const filteredSubCategory of filteredSubCategories) {
+    // If sub categories are more than 0
+    if (subCategories.length > 0) {
+        // Add all sub categories to request queue
+        for (const subCategory of subCategories) {
+            await requestQueue.addRequest({
+                uniqueKey: subCategory.link,
+                url: subCategory.link,
+                userData: {
+                    label: 'CATEGORY',
+                    baseUrl,
+                },
+            });
+        }
+    } else {
+        // Move to listing
         await requestQueue.addRequest({
-            url: `https:${filteredSubCategory}?SortType=total_tranpro_desc`,
+            uniqueKey: `${request.url}-LIST`,
+            url: request.url,
             userData: {
-                label: 'CATEGORY',
-                pageNum: startPage || 1,
-                categoryBaseURL: `https:${filteredSubCategory}`,
+                label: 'LIST',
+                page: 1,
+                baseUrl,
             },
         });
     }
 
-    log.debug(`CRAWLER -- ${filteredSubCategories.length} categories added to queue`);
-};
 
+    log.debug(`CRAWLER -- Fetched ${subCategories.length} subcategories and moving to each of them`);
+};
 
 // Categoy page crawler
 // Add next page on request queue
 // Fetch products from list and add all links to request queue
-exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
+exports.LIST = async ({ $, userInput, request }, { requestQueue }) => {
     const { endPage = -1 } = userInput;
     const { pageNum = 1, categoryBaseURL } = request.userData;
 
