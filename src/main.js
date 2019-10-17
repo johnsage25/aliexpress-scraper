@@ -54,7 +54,7 @@ Apify.main(async () => {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
-            if ($('html').text().includes('localStorage.x5referer').length > 0) {
+            if ($('html').text().includes('/_____tmd_____/punish')) {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
