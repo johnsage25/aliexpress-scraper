@@ -17,7 +17,13 @@ const getAllSubCategories = async (base, mainCategoryPaths) => {
     // Fetch all subcategories
     for (const categoryPath of mainCategoryPaths) {
         // Fetch subcategory page
-        const { data } = await axios.get(`${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`, { timeout: 0, rejectUnauthorized: false });
+        const { data } = await axios.get(
+            `${base}/api/load_ams_path.htm?path=aliexpress.com/common/@langField/ru/${categoryPath}.htm`,
+            {
+                timeout: 0,
+                rejectUnauthorized: false,
+            },
+        );
 
         // Load to cheerio
         const temp$ = cheerio.load(data);
