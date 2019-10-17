@@ -52,7 +52,7 @@ exports.CATEGORY = async ({ $, request }, { requestQueue }) => {
 // Fetch products from list and add all links to request queue
 exports.LIST = async ({ $, userInput, request }, { requestQueue }) => {
     const { endPage = -1 } = userInput;
-    const { pageNum = 1, categoryBaseURL } = request.userData;
+    const { pageNum = 1, baseUrl } = request.userData;
 
     log.info(`CRAWLER -- Fetching category: ${request.url} with page: ${pageNum}`);
 
@@ -65,11 +65,11 @@ exports.LIST = async ({ $, userInput, request }, { requestQueue }) => {
         if (endPage > 0 ? pageNum + 1 <= endPage : true) {
             // Add next page of same category to queue
             await requestQueue.addRequest({
-                url: `${categoryBaseURL}?page=${pageNum + 1}&SortType=total_tranpro_desc`,
+                url: `${baseUrl}?page=${pageNum + 1}&SortType=total_tranpro_desc`,
                 userData: {
                     label: 'CATEGORY',
                     pageNum: pageNum + 1,
-                    categoryBaseURL,
+                    baseUrl,
                 },
             });
         }

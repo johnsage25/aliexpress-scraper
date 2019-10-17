@@ -74,11 +74,11 @@ const getProductDetail = ($, url) => {
             url: `https:${storeModule.storeURL}`,
             topRatedSeller: storeModule.topRatedSeller,
         },
-        specs: specsModule.props.map((spec) => {
+        specs: specsModule.props ? specsModule.props.map((spec) => {
             const obj = {};
             obj[spec.attrName] = spec.attrValue;
             return obj;
-        }),
+        }) : [],
         categories: crossLinkModule.breadCrumbPathList
             .map(breadcrumb => breadcrumb.target)
             .filter(breadcrumb => breadcrumb),
