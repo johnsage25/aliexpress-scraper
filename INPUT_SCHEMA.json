@@ -19,7 +19,7 @@
         },
         "categoryLink": {
             "title": "Category Link",
-            "type": "integer",
+            "type": "string",
             "description": "Category that you want to crawl",
             "editor": "textfield"
         },
