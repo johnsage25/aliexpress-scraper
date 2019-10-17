@@ -93,9 +93,9 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
 
 // Product page crawler
 // Fetches product detail from detail page
-exports.PRODUCT = async ({ $, userInput, request, agent }) => {
+exports.PRODUCT = async ({ $, userInput, request, agent }, { requestQueue }) => {
     const { productId } = request.userData;
-    const { includeQuestions = false, includeFeedbacks = false, includeDescription = false } = userInput;
+    const { includeDescription = false } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
@@ -104,41 +104,36 @@ exports.PRODUCT = async ({ $, userInput, request, agent }) => {
 
     // Check description option
     if (includeDescription) {
-        // Delay in random
-
         // Fetch description
-        const { description, overview } = await extractors.getProductDescription(product.descriptionURL);
-        product.description = description;
-        product.overview = overview;
-        delete product.descriptionURL;
-        console.log(`Description fetched --- ${request.url}`);
+        await requestQueue.addRequest({
+            uniqueKey: `${product.id}-description`,
+            url: product.descriptionURL,
+            userData: {
+                label: 'DESCRIPTION',
+                product,
+            },
+        });
+    } else {
+        // Push data
+        await Apify.pushData({ ...product });
+        log.debug(`CRAWLER -- Fetching product: ${productId} completed and successfully pushed to dataset`);
     }
+};
 
-    // Check feedback option
-    if (includeFeedbacks) {
-        // Delay in random
 
-        // Get Feedbacks
-        const { summary, feedbacks } = await extractors.getProductFeedbacks(userInput, product.id, request.url, product.companyId, product.memberId, agent);
-        product.feedbacks = feedbacks;
-        product.feedbackSummary = summary;
-        delete product.companyId;
-        delete product.memberId;
-        console.log(`Feedbacks fetched --- ${request.url}`);
-    }
+// Description page crawler
+// Fetches description detail and push data
+exports.DESCRIPTION = async ({ $, request }) => {
+    const { product } = request.userData;
 
-    // Check question option
-    if (includeQuestions) {
-        // Delay in random
+    log.info(`CRAWLER -- Fetching product description: ${product.id}`);
 
-        // Fetch questions
-        product.questions = await extractors.getProductQuestions(userInput, productId, request.url, agent);
-        console.log(`Questions fetched --- ${request.url}`);
-    }
+    // Fetch product details
+    const description = await extractors.getProductDescription($);
+    product.description = description;
 
     // Push data
     await Apify.pushData({ ...product });
 
-    // await page.close();
-    log.debug(`CRAWLER -- Fetching product: ${productId} completed and successfully pushed to dataset`);
+    log.debug(`CRAWLER -- Fetching product description: ${product.id} completed and successfully pushed to dataset`);
 };

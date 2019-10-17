@@ -5,6 +5,8 @@ const {
     utils: { log },
 } = Apify;
 
+// SSL Error fix
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 // Create crawler
 Apify.main(async () => {
@@ -32,14 +34,29 @@ Apify.main(async () => {
         requestQueue,
         handlePageTimeoutSecs: 99999,
         maxRequestRetries: 10,
+        requestTimeoutSecs: 300,
         maxConcurrency: userInput.maxConcurrency,
         ignoreSslErrors: true,
         // Proxy options
         ...(userInput.proxy.useApifyProxy ? { useApifyProxy: userInput.proxy.useApifyProxy } : {}),
         ...(userInput.proxy.apifyProxyGroups ? { apifyProxyGroups: userInput.proxy.apifyProxyGroups } : {}),
         ...(userInput.proxy.proxyUrls ? { proxyUrls: userInput.proxy.proxyUrls } : {}),
+        prepareRequestFunction: ({ request }) => {
+            request.headers = {
+                Connection: 'keep-alive',
+                'User-Agent': Apify.utils.getRandomUserAgent(),
+            };
+
+            // SSL error fix
+            request.gzip = true;
+            request.insecure = true;
+            request.rejectUnauthorized = false;
+
+            return request;
+        },
         handlePageFunction: async (context) => {
             const { request, response, $ } = context;
+
             log.debug(`CRAWLER -- Processing ${request.url}`);
 
             // Status code check
@@ -50,7 +67,7 @@ Apify.main(async () => {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 
-            if (request.userData.label !== 'HOME' && $('script').text().includes('runParams').length === 0) {
+            if (request.userData.label !== 'HOME' && !$('script').text().includes('runParams')) {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
 

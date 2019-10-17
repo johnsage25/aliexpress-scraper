@@ -1,5 +1,5 @@
 {
-	"name": "apify-aliexpress",
+	"name": "apify-aliexpress-public",
 	"version": "0.0",
 	"buildTag": "latest",
 	"env": null,
