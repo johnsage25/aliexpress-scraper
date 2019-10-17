@@ -10,7 +10,7 @@ const getAllMainCategoryPaths = ($) => {
 };
 
 // Fetch every subcategory hidden pages (loaders)
-const getAllSubCategories = async (base, mainCategoryPaths) => {
+const getAllSubCategories = async (base, mainCategoryPaths, agent) => {
     let subCategories = [];
 
     // Fetch all subcategories
@@ -25,6 +25,7 @@ const getAllSubCategories = async (base, mainCategoryPaths) => {
                 },
                 timeout: 0,
                 rejectUnauthorized: false,
+                agent,
             },
         );
 

@@ -28,8 +28,8 @@ exports.createRouter = (globalContext) => {
 };
 
 // Creates proxy URL with user input
-exports.createProxyUrl = async () => {
-    const { apifyProxyGroups, useApifyProxy, proxyUrls } = global.userInput;
+exports.createProxyUrl = async (userInput) => {
+    const { apifyProxyGroups, useApifyProxy, proxyUrls } = userInput;
     if (proxyUrls && proxyUrls.length > 0) {
         return proxyUrls[0];
     }
@@ -42,7 +42,7 @@ exports.createProxyUrl = async () => {
 };
 
 // Returns an axios instance with proxy and timeout options set
-exports.getProxyAgent = async () => {
-    const url = await this.createProxyUrl();
-    return new HttpsProxyAgent(url);
+exports.getProxyAgent = async (userInput) => {
+    const url = await this.createProxyUrl(userInput);
+    return url ? new HttpsProxyAgent(url) : null;
 };

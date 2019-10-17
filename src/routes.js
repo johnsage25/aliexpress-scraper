@@ -10,7 +10,7 @@ const {
 // Home page crawler.
 // Checks user input and create category links
 // Adds categories to request queue
-exports.HOME = async ({ $, userInput, request }, { requestQueue }) => {
+exports.HOME = async ({ $, userInput, request, agent }, { requestQueue }) => {
     const { startPage = 0, categoryStartIndex = 0, categoryEndIndex = null } = userInput;
 
     log.info('CRAWLER -- Fetching Categories');
@@ -19,12 +19,13 @@ exports.HOME = async ({ $, userInput, request }, { requestQueue }) => {
     const mainCategoryPaths = await extractors.getAllMainCategoryPaths($);
 
     // Get all subcategory links
-    const subCategories = await extractors.getAllSubCategories(request.url, mainCategoryPaths);
+    const subCategories = await extractors.getAllSubCategories(request.url, mainCategoryPaths, agent);
 
     log.info(`CRAWLER -- Fetched total of ${subCategories.length} categories`);
 
     // Filter categories if needed
     const filteredSubCategories = extractors.filterSubCategories(categoryStartIndex, categoryEndIndex, subCategories);
+
 
     // Adding all subcategory links to queue
     for (const filteredSubCategory of filteredSubCategories) {
@@ -33,7 +34,7 @@ exports.HOME = async ({ $, userInput, request }, { requestQueue }) => {
             userData: {
                 label: 'CATEGORY',
                 pageNum: startPage || 1,
-                categoryBaseURL: filteredSubCategory,
+                categoryBaseURL: `https:${filteredSubCategory}`,
             },
         }, { forefront: true });
     }
@@ -93,14 +94,14 @@ exports.CATEGORY = async ({ $, userInput, request }, { requestQueue }) => {
 
 // Product page crawler
 // Fetches product detail from detail page
-exports.PRODUCT = async ({ $, userInput, request, agent }, { requestQueue }) => {
+exports.PRODUCT = async ({ $, userInput, request }, { requestQueue }) => {
     const { productId } = request.userData;
     const { includeDescription = false } = userInput;
 
     log.info(`CRAWLER -- Fetching product: ${productId}`);
 
     // Fetch product details
-    const product = await extractors.getProductDetail($, request.url, agent);
+    const product = await extractors.getProductDetail($, request.url);
 
     // Check description option
     if (includeDescription) {

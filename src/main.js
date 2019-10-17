@@ -1,19 +1,16 @@
 const Apify = require('apify');
+const Promise = require('bluebird');
 const tools = require('./tools');
 
 const {
     utils: { log },
 } = Apify;
 
-// SSL Error fix
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 // Create crawler
 Apify.main(async () => {
     log.info('PHASE -- STARTING ACTOR.');
 
     const userInput = await Apify.getInput();
-    global.userInput = userInput;
 
     log.info('ACTOR OPTIONS: -- ', userInput);
 
@@ -24,7 +21,7 @@ Apify.main(async () => {
     const homepage = await tools.getSources();
     await requestQueue.addRequest({ ...homepage });
 
-    const agent = await tools.getProxyAgent();
+    const agent = await tools.getProxyAgent(userInput);
 
     // Create route
     const router = tools.createRouter({ requestQueue });
@@ -46,11 +43,6 @@ Apify.main(async () => {
                 Connection: 'keep-alive',
                 'User-Agent': Apify.utils.getRandomUserAgent(),
             };
-
-            // SSL error fix
-            request.gzip = true;
-            request.insecure = true;
-            request.rejectUnauthorized = false;
 
             return request;
         },
@@ -74,6 +66,9 @@ Apify.main(async () => {
             if ($('html').text().includes('/_____tmd_____/punish')) {
                 throw new Error(`We got blocked by target on ${request.url}`);
             }
+
+            // Random delay
+            await Promise.delay(Math.random() * 3000);
 
             // Add user input to context
             context.userInput = userInput;
