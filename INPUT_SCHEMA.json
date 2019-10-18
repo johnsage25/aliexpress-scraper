@@ -41,5 +41,5 @@
             "default": { "useApifyProxy": true },
             "editor": "proxy"
         }
-    },
+    }
 }
