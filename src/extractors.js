@@ -35,7 +35,7 @@ const getProductsOfPage = ($) => {
         dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(/;/g, ''),
     );
 
-    return data.items && data.items.length > 0 ? data.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl })) : [];
+    return data.items && data.items.length > 0 ? data.items.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl })) : [];
 };
 
 // Fetch basic product detail from a global object `runParams`
