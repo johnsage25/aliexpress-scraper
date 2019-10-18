@@ -31,10 +31,11 @@ const filterSubCategories = (categoryStartIndex = 0, categoryEndIndex = null, su
 // Fetch all products from a global object `runParams`
 const getProductsOfPage = ($) => {
     const dataScript = $($('script').filter((i, script) => $(script).html().includes('runParams')).get()[0]).html();
-
-    return JSON.parse(
+    const data = JSON.parse(
         dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(/;/g, ''),
-    ).items.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl }));
+    );
+
+    return data.items && data.items.length > 0 ? data.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl })) : [];
 };
 
 // Fetch basic product detail from a global object `runParams`

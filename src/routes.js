@@ -10,8 +10,6 @@ const {
 // Add next page on request queue
 // Fetch products from list and add all links to request queue
 exports.CATEGORY = async ({ $, request }, { requestQueue }) => {
-    const { baseUrl } = request.userData;
-
     log.info(`CRAWLER -- Fetching category link: ${request.url}`);
 
     // Extract sub category links
@@ -26,7 +24,6 @@ exports.CATEGORY = async ({ $, request }, { requestQueue }) => {
                 url: subCategory.link,
                 userData: {
                     label: 'CATEGORY',
-                    baseUrl,
                 },
             });
         }
@@ -37,8 +34,8 @@ exports.CATEGORY = async ({ $, request }, { requestQueue }) => {
             url: request.url,
             userData: {
                 label: 'LIST',
-                page: 1,
-                baseUrl,
+                pageNum: 1,
+                baseUrl: request.url,
             },
         });
     }
@@ -67,7 +64,7 @@ exports.LIST = async ({ $, userInput, request }, { requestQueue }) => {
             await requestQueue.addRequest({
                 url: `${baseUrl}?page=${pageNum + 1}&SortType=total_tranpro_desc`,
                 userData: {
-                    label: 'CATEGORY',
+                    label: 'LIST',
                     pageNum: pageNum + 1,
                     baseUrl,
                 },
