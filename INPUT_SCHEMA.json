@@ -1,5 +1,5 @@
 {
-    "title": "Aliexpress.com Scraper",
+    "title": "Aliexpress Scraper",
     "description": "An actor that scrapes products from aliexpress.com",
     "type": "object",
     "schemaVersion": 1,
@@ -17,11 +17,15 @@
             "description": "The page number that you want to end with. By default there is no end page.",
             "editor": "number"
         },
-        "categoryLink": {
-            "title": "Category Link",
-            "type": "string",
-            "description": "Category that you want to crawl",
-            "editor": "textfield"
+        "startUrls": {
+            "title": "Start URLs",
+            "type": "array",
+            "description": "URLs to start with. It should be category or product detail URLs",
+            "prefill": [
+                { "url": "https://www.aliexpress.com/category/200003482/dresses.html" },
+                { "url": "https://www.aliexpress.com/item/32940810951.html" }
+            ],
+            "editor": "requestListSources"
         },
         "includeDescription": {
             "title": "Description",
@@ -34,9 +38,8 @@
             "title": "Proxy configuration",
             "type": "object",
             "description": "Select proxies to be used by your crawler.",
-            "prefill": { "useApifyProxy": true },
+            "default": { "useApifyProxy": true },
             "editor": "proxy"
         }
     },
-    "required":["categoryLink"]
 }

@@ -17,16 +17,21 @@ Apify.main(async () => {
     // Create request queue
     const requestQueue = await Apify.openRequestQueue();
 
+    // Fetch start urls
+    const { startUrls } = userInput;
 
-    // Initialize first request
-    await requestQueue.addRequest({
-        uniqueKey: userInput.categoryLink,
-        url: userInput.categoryLink,
-        userData: {
-            label: 'CATEGORY',
-            baseUrl: userInput.categoryLink,
-        },
-    });
+    if (startUrls.length === 0) {
+        throw new Error('Start URLs must be defined');
+    } else {
+        const mappedStartUrls = tools.mapStartUrls(startUrls);
+        // Initialize first requests
+        for (const mappedStartUrl of mappedStartUrls) {
+            await requestQueue.addRequest({
+                ...mappedStartUrl,
+            });
+        }
+    }
+
 
     const agent = await tools.getProxyAgent(userInput);
 
