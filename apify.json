@@ -1,7 +1,7 @@
 {
 	"name": "aliexpress-scrapper",
 	"version": "1.0",
-	"buildTag": "latest",
+	"buildTag": "v-1",
 	"env": null,
 	"template": "cheerio_crawler"
 }
