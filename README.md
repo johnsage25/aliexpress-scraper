@@ -14,8 +14,6 @@ Features **not** available in this scraper:
 - Scrape feedbacks of product detail
 - Scrape questions of product detail
 
-Both feedbacks and questions works with pagination in Aliexpress, which needs extra requests. And products have ~200-1K feedbacks on average. That leads actor to execute extra 10 requests of minimum and that makes the actor very unefficient and unstable. It can drain your computational units without your knowledge.
-
 
 ## Aliexpress Scraper - future
 
@@ -38,6 +36,10 @@ The input of this scraper should be JSON containing the list of pages on Aliexpr
 | proxy | Object | Proxy configuration |
 
 This solution requires the use of **Proxy servers**, either your own proxy servers or you can use <a href="https://www.apify.com/docs/proxy">Apify Proxy</a>.
+
+
+### Compute Unit Consumption
+The actor optimized to run blazing fast and scrape many product as possible. Therefore, it forefronts all product detail requests. If actor doesn't block very often it'll scrape ~14K products in 14 minutes with ~1.8-2.0 compute units.
 
 ### Aliexpress Scraper Input example
 ```json

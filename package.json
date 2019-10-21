@@ -1,6 +1,6 @@
 {
 	"name": "aliexpress-scrapper",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Aliexpress.com scraper.",
 	"dependencies": {
 		"apify": "^0.16.0",
