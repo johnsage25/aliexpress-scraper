@@ -35,6 +35,10 @@ const getProductsOfPage = ($) => {
         dataScript.split('window.runParams = ')[2].split('window.runParams.csrfToken =')[0].replace(/;/g, ''),
     );
 
+    if (!data.success) {
+        throw new Error('We got blocked when trying to fetch products!');
+    }
+
     return data.items && data.items.length > 0 ? data.items.map(item => ({ id: item.productId, name: item.title, link: item.productDetailUrl })) : [];
 };
 
